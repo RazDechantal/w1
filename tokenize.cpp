@@ -39,5 +39,17 @@ int main()
     {
         std::cout << t << std::endl;
     }
+    s = "1,22,333,4444,55555";
+    tokens = tokenize(s, ',');
+    for (const std::string &t : tokens)
+    {
+        std::cout << t << std::endl;
+    }
+    s = "ölkölk,iuoiuoi,1,2,ölkölkölk,7777";
+    tokens = tokenize(s, ',');
+    for (const std::string &t : tokens)
+    {
+        std::cout << t << std::endl;
+    }
     return 0;
 }
