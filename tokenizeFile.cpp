@@ -52,28 +52,36 @@ int main()
     //     std::cout << t << std::endl;
     // }
 
-    ifstream csvFile{"20200317.csv"};
+    ifstream csvFile{"x.csv"};
     string line;
-    std::vector<std::string> tokens;
 
     if (csvFile.is_open())
     {
         cout << "File is open" << endl;
-        getline(csvFile, line);
-
-        while (getline(csvFile, line))
+        while (std::getline(csvFile, line))
         {
             cout << "Read line: " << line << endl;
-            tockens = tokenize(line, ',');
-            cout << "Token size is: " << tokens.size() << endl;
+            std::vector<std::string> tokens = tokenize(line, ',');
             if (tokens.size() != 5)
             {
-                cout << "Bad token" << endl;
+                cout << "Bad line" << endl;
                 continue;
             }
-            double price = stod(tokens[3]);
-            double amount = stod(tokens[4]);
-            cout << price << ": " << amount << endl;
+            else
+            {
+                try
+                {
+                    double price = stod(tokens[3]);
+                    double amount = stod(tokens[4]);
+                    cout << "Price is: " << price << " for: " << amount << endl;
+                }
+                catch (const std::invalid_argument &e)
+                {
+                    cout << "Bad float! " << endl;
+                    std::cerr << e.what() << '\n';
+                    break;
+                }
+            }
         }
 
         csvFile.close();
