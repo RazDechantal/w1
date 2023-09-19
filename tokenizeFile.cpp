@@ -2,8 +2,79 @@
 #include <vector>
 #include <fstream>
 
-std::vector<std::string> tockens;
 using namespace std;
+
+enum class OrderBookType
+{
+    bid,
+    ask
+};
+
+int corruptedLines = 0;
+
+ostream &operator<<(ostream &strm, OrderBookType ord)
+{
+    const string nameTT[] = {"ID", "KeyWord", "Operator", "Expression", "String", "Number", "Char"};
+    return strm << ord;
+}
+class OrderBookEntry
+{
+
+private:
+    string timestamp;
+    string transaction;
+    double price;
+    double amount;
+    OrderBookType ord;
+
+public:
+    double getPrice()
+    {
+        return price;
+    }
+    double getAmount()
+    {
+        return amount;
+    }
+    string getTimestamp()
+    {
+        return timestamp;
+    }
+    string getTransaction()
+    {
+        return transaction;
+    }
+    OrderBookType getOrderType()
+    {
+        return ord;
+    }
+    void setPrice(double givenPrice)
+    {
+        price = givenPrice;
+    }
+    void setAmount(double givenAmount)
+    {
+        amount = givenAmount;
+    }
+    void setTimestamp(string givenTimestamp)
+    {
+        timestamp = givenTimestamp;
+    }
+    void setTransaction(string givenTransaction)
+    {
+        transaction = givenTransaction;
+    }
+    void setOrderType(string orderType)
+    {
+        if (orderType == "bid")
+            ord = OrderBookType::bid;
+        else
+            ord = OrderBookType::ask;
+    }
+};
+
+std::vector<std::string> tockens;
+std::vector<OrderBookEntry> orders;
 
 std::vector<std::string> tokenize(std::string s, char c)
 {
@@ -34,23 +105,7 @@ std::vector<std::string> tokenize(std::string s, char c)
 
 int main()
 {
-    // std::string s = "2020/03/17 17:01:24.884492,ETH/BTC,bid,0.02187308,7.44564869";
-    // for (const std::string &t : tokens)
-    // {
-    //     std::cout << t << std::endl;
-    // }
-    // s = "1,22,333,4444,55555";
-    // tokens = tokenize(s, ',');
-    // for (const std::string &t : tokens)
-    // {
-    //     std::cout << t << std::endl;
-    // }
-    // s = "ölkölk,iuoiuoi,1,2,ölkölkölk,7777";
-    // tokens = tokenize(s, ',');
-    // for (const std::string &t : tokens)
-    // {
-    //     std::cout << t << std::endl;
-    // }
+    OrderBookEntry order;
 
     ifstream csvFile{"x.csv"};
     string line;
@@ -67,23 +122,35 @@ int main()
                 cout << "Bad line" << endl;
                 continue;
             }
-            else
+            try
             {
-                try
-                {
-                    double price = stod(tokens[3]);
-                    double amount = stod(tokens[4]);
-                    cout << "Price is: " << price << " for: " << amount << endl;
-                }
-                catch (const std::invalid_argument &e)
-                {
-                    cout << "Bad float! " << endl;
-                    std::cerr << e.what() << '\n';
-                    break;
-                }
+                double price = stod(tokens[3]);
+                double amount = stod(tokens[4]);
+                order.setPrice(price);
+                order.setAmount(amount);
+                order.setTimestamp(tokens[0]);
+                order.setTransaction(tokens[1]);
+                order.setOrderType(tokens[2]);
+                orders.push_back(order);
+
+                cout << "Price is: " << order.getPrice() << endl;
+                cout << "Amount is: " << order.getAmount() << endl;
+                cout << "Time stamp: " << order.getTimestamp() << endl;
+                cout << "Transaction is: " << order.getTransaction() << endl;
+                string myOrder = (order.getOrderType() == OrderBookType::ask) ? "ask" : "bid";
+                cout << "Order Type: " << myOrder << endl;
+            }
+            catch (const std::invalid_argument &e)
+            {
+                cout << "Bad float! " << endl;
+                std::cerr << e.what() << '\n';
+                ++corruptedLines;
+                continue;
             }
         }
 
+        cout << "The total number of orders: " << orders.size() << endl;
+        cout << "The total number of corrupted lines: " << corruptedLines << endl;
         csvFile.close();
     }
 

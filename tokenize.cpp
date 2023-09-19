@@ -4,7 +4,8 @@
 std::vector<std::string> tockens;
 using namespace std;
 
-std::vector<std::string> tokenize(std::string s, char c)
+std::vector<std::string>
+tokenize(std::string s, char c)
 {
     std::vector<std::string> tokens;
     signed int start, end;
